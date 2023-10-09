@@ -1,4 +1,8 @@
 fastapi
+sqlalchemy
+mysql-connector-python  
+aiomysql
+alembic
 uvicorn
 passlib
 pyjwt

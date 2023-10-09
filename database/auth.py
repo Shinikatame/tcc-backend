@@ -1,22 +1,20 @@
-from json import load, dump
+from sqlalchemy import Column, Integer, String
+from database import Base, commit, engine, AsyncSessionLocal
 
-from models.user import UserCreate
+from models.user import UserSignUp
 
-class AuthModel:
-    def __init__(self):
-        self.data: [UserCreate] = self.get_data()
+class UserORM(Base):
+    __tablename__ = 'users'
     
-    def create(self, user: UserCreate):
-        self.write_data(user)
-    
-    def get_data(self) -> [UserCreate]:
-        with open('data.json', 'r', encoding = 'UTF-8') as file:
-            return load(file)
-        
-    def write_data(self, user: UserCreate):
-        with open('data.json', 'w+', encoding = 'UTF-8') as file:
-            self.data.append(user.dict())
-            dump(self.data, file, indent = 4)
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique = True)
+    email = Column(String, unique = True)
+    password = Column(String)
 
+    def __repr__(self) -> str:
+        return f'UserORM(id={self.id}, name={self.username}, email={self.email}, password={self.password})'
 
-auth = AuthModel()
+    @classmethod
+    @commit
+    async def create_user(cls, user: UserSignUp):
+        return cls(**user.dict())
