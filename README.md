@@ -4,7 +4,7 @@
 
 ## Passos para Executar em Modo de Produção
 
-Siga estes passos para configurar e executar seu projeto FastAPI em modo de produção:
+Siga estes passos para configurar e executar seu projeto FastAPI:
 
 ```bash
 cp .env.example .env

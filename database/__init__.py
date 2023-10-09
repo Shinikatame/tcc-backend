@@ -14,7 +14,7 @@ NAME = getenv('DATABASE')
 
 SQL_URL =  f'mysql+aiomysql://{USERNAME}:{PASSWORD}@{HOST}/{NAME}'
 
-ctx = create_default_context(cafile = '/etc/ssl/certs/ca-certificates.crt')
+ctx = create_default_context(cafile = getenv('SSL'))
 engine = create_async_engine(
     SQL_URL, 
     connect_args = {'ssl': ctx},
