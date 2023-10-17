@@ -20,7 +20,7 @@ app.add_middleware(
 
 def load(path = 'routers'): 
     for file in listdir(path):
-        if file not in ['__pycache__', '__init__.py']:
+        if not file.startswith('_'):
             if file.endswith('.py'):
                 module = import_module(f'{path}.{file}'.replace('.py', '').replace('/', '.'))
                 app.include_router(module.router)
@@ -30,6 +30,6 @@ def load(path = 'routers'):
 
 load()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     from uvicorn import run
-    run(app, host="0.0.0.0", port=8000)
+    run(app, host = '0.0.0.0', port = 8000)
