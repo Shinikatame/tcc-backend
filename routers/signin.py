@@ -11,6 +11,9 @@ async def signin(body: UserSignIn):
     
     if not user or not password_hash.verify(body.password, user.password): 
         raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED, detail = "Credenciais inválidas")
+
+    if len(body.state) <= 2:
+        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "String 'state' aceita no max 2 caracteres")
     
     token = create_jwt(user)
     response = UserResponse(**user.dict(), token = token)
