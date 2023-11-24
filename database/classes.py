@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Boolean
 from database import Base, commit, engine, AsyncSessionLocal
 
 from models.user import UserSignUp
+from models.classes import Class
 
 class ClassesORM(Base):
     __tablename__ = 'classes'
@@ -14,5 +15,5 @@ class ClassesORM(Base):
     
     @classmethod
     @commit
-    async def create_user(cls, user: UserSignUp):
-        return cls(**user.dict())
+    async def create_class(cls, class_: Class):
+        return cls(**class_.dict())
