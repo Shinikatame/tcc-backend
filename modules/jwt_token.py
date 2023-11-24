@@ -4,7 +4,7 @@ from jwt.exceptions import DecodeError
 from passlib.context import CryptContext
 
 from models.user import UserToken, UserSignUp, UserResponse
-from database.auth import UserORM
+from database.user import UserORM
 
 from dotenv import load_dotenv
 from os import getenv

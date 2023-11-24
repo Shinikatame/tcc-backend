@@ -2,7 +2,7 @@ from fastapi import HTTPException, status, Header
 from routers import router
 
 from models.user import UserSignUp, UserSignIn, UserEdit, UserResponse
-from database.auth import UserORM
+from database.user import UserORM
 from modules.jwt_token import create_jwt, verify_jwt, password_hash
 
 @router.post("/signup", status_code = 201, response_model = UserResponse)

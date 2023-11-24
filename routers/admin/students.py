@@ -4,8 +4,7 @@ from routers.admin import router
 from typing import List
 
 from models.user import UserSignUp, UserEdit, UserResponse
-from database.auth import UserORM
-
+from database.user import UserORM
 from modules.jwt_token import create_jwt, password_hash
 
 @router.get("/students/{student_id}", response_model = UserResponse)
