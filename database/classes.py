@@ -12,6 +12,7 @@ class ClassesORM(Base):
     name = Column(String)
     description = Column(String)
     link = Column(String)
+    order = Column(Integer)
     
     @classmethod
     @commit

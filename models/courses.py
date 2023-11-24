@@ -12,6 +12,10 @@ class CoursesPost(Courses):
     classes: List[Classes]
 
 
+class CourseResponse(Courses):
+    id: int
+
+
 class CoursesResponse(Courses):
     id: int
     classes: List[ClassesResponse]

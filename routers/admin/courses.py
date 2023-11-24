@@ -7,7 +7,6 @@ from models.courses import CoursesPost, CoursesResponse, Courses
 from models.classes import Classes, Class
 from database.courses import CoursesORM
 from database.classes import ClassesORM
-from modules.jwt_token import create_jwt, password_hash
 
 
 async def create_class(course_id: int, class_: Classes):

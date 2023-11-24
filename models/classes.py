@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+
+from typing import List
     
 class Classes(BaseModel):
     name: str
@@ -12,3 +14,14 @@ class Class(Classes):
 
 class ClassesResponse(Classes):
     id: int
+
+
+class ClassesLink(BaseModel):
+    id: int
+    name: str
+    link: str
+
+
+class ClassCurrent(BaseModel):
+    current: ClassesResponse
+    next_classes: List[ClassesLink]

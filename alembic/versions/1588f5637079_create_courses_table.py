@@ -33,6 +33,7 @@ def upgrade() -> None:
         sa.Column('name', sa.String(255), nullable=False),
         sa.Column('description', sa.Text(), nullable=True),
         sa.Column('link', sa.String(255), nullable=True),
+        sa.Column('order', sa.Integer, nullable=False),
     )
 
 def downgrade() -> None:
