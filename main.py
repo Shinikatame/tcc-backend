@@ -19,7 +19,10 @@ app.add_middleware(
 )
 
 def load(path = 'routers'): 
-    for file in listdir(path):
+    dir = listdir(path)
+    dir.sort()
+
+    for file in dir:
         if not file.startswith('_'):
             if file.endswith('.py'):
                 module = import_module(f'{path}.{file}'.replace('.py', '').replace('/', '.'))
