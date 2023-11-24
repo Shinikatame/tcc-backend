@@ -10,6 +10,7 @@ class Classes(BaseModel):
 
 class Class(Classes):
     course_id: int
+    order: int
     
 
 class ClassesResponse(Classes):

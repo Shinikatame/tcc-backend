@@ -20,13 +20,17 @@ async def courses_get():
 @router.get("/courses/{course_id}/class/{class_id}", status_code = 200, response_model = ClassCurrent)
 async def classe_get(course_id: int, class_id: int):
     class_ = await ClassesORM.find_one(id = class_id)
+    if class_.course_id != course_id:
+        raise HTTPException(status_code = 404, detail = 'Aulas não encontradas')
+
     classes = await ClassesORM.find_many(course_id = course_id)
     
     next_classes = [c.dict() for c in classes if isinstance(c.dict(), dict)]
+    next_classes = sorted(next_classes, key = lambda c: c.get('order'))
     
     response = ClassCurrent(
         current = class_.dict(), 
-        next_classes = next_classes
+        next_classes = next_classes[class_.order+1:]
     )
     
     return response
