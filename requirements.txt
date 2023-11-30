@@ -6,4 +6,5 @@ alembic
 uvicorn
 passlib
 pyjwt
+bcrypt
 python-dotenv
