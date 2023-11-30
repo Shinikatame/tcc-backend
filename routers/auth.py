@@ -11,7 +11,7 @@ async def signup(body: UserSignUp):
     if user:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "O email já está em uso")
 
-    if len(body.state) < 2:
+    if len(body.state) >= 3:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "String 'state' aceita no max 2 caracteres")
     
     body.password = password_hash.hash(body.password)
