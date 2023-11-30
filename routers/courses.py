@@ -16,7 +16,6 @@ async def courses_get():
     return response
 
 
-
 @router.get("/courses/{course_id}/class/{class_id}", status_code = 200, response_model = ClassCurrent)
 async def classe_get(course_id: int, class_id: int):
     class_ = await ClassesORM.find_one(id = class_id)
