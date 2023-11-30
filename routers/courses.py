@@ -25,7 +25,7 @@ async def courses_get():
 @router.get("/courses/{course_id}/class/{class_id}", status_code = 200, response_model = ClassCurrent)
 async def classe_get(course_id: int, class_id: int):
     class_ = await ClassesORM.find_one(id = class_id)
-    if class_.course_id != course_id:
+    if not class_ or class_.course_id != course_id:
         raise HTTPException(status_code = 404, detail = 'Aulas não encontradas')
 
     classes = await ClassesORM.find_many(course_id = course_id)
