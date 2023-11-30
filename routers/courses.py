@@ -12,7 +12,13 @@ from database.classes import ClassesORM
 @router.get("/courses", status_code = 200, response_model = List[CourseResponse])
 async def courses_get():
     courses = await CoursesORM.find_many()
-    response = [CourseResponse(**c.dict()) for c in courses if isinstance(c.dict(), dict)]
+    response = []
+
+    for course in courses:
+        class_ = await ClassesORM.find_one(course_id = course.id)
+        data = CourseResponse(class_id = class_.id, **course.dict())
+        response.append(data)
+
     return response
 
 
