@@ -35,7 +35,7 @@ async def classe_get(course_id: int, class_id: int):
     
     response = ClassCurrent(
         current = class_.dict(), 
-        next_classes = next_classes[class_.order+1:]
+        next_classes = next_classes
     )
     
     return response
