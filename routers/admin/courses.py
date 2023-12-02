@@ -32,7 +32,7 @@ async def course_create(parms: CoursesPost):
 @router.delete("/courses/{course_id}", status_code = 204)
 async def course_delete(course_id: int):
     course = await CoursesORM.delete(id = course_id)
-    if not course: raise HTTPException(status_code = 404, detail = 'Aluno não encontrado')
+    if not course: raise HTTPException(status_code = 404, detail = 'Curso não encontrado')
     await ClassesORM.delete(course_id = course_id)
     await MaterialORM.delete(course_id = course_id)
 
