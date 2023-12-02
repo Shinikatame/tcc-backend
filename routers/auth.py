@@ -50,6 +50,6 @@ async def profile_get(Authorization: str = Header(None)):
 @router.put("/profile", response_model = UserResponse)
 async def profile_edit(user_update: UserEdit, user: dict = Depends(has_authenticated)):
     user = await UserORM.update(user.id, **user_update.dict())
-    response = UserResponse(**user.dict(), token = token)
+    response = UserResponse(**user.dict())
      
     return response

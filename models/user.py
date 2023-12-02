@@ -30,4 +30,4 @@ class UserToken(BaseModel):
     
 class UserResponse(User):
     id: int
-    token: str = None
+    token: Optional[str] = None
