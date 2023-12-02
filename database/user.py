@@ -12,6 +12,7 @@ class UserORM(Base):
     password = Column(String)
     birth = Column(Integer)
     name_responsible = Column(String)
+    phone_responsible = Column(String)
     email_responsible = Column(String)
     cpf_responsible = Column(String)
     zip_code = Column(String)

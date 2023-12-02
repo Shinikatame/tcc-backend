@@ -6,6 +6,7 @@ class User(BaseModel):
     email: str
     birth: int
     name_responsible: str
+    phone_responsible: str
     email_responsible: str
     cpf_responsible: str
     zip_code: str
