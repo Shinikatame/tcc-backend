@@ -28,6 +28,7 @@ class UserEdit(User):
 class UserToken(BaseModel):
     id: int
     
+    
 class UserResponse(User):
     id: int
     token: Optional[str] = None

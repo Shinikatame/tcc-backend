@@ -35,13 +35,8 @@ async def signin(params: UserSignIn):
 
 
 @router.get("/profile", response_model = UserResponse)
-async def profile_get(Authorization: str = Header(None)):
-    if not Authorization or not Authorization.startswith("Bearer "):
-        detail = 'Cabeçalho "Authorization" não especificado na solicitação' if not Authorization else 'Token JWT inválido'
-        raise HTTPException(status_code = 401, detail = detail)
-    
-    token = Authorization.replace('Bearer ', '')
-    user = await verify_jwt(token)
+async def profile_get(user: dict = Depends(has_authenticated)):
+    user = await UserORM.find_one(id = user.id)
     response = UserResponse(**user.dict())
      
     return response
