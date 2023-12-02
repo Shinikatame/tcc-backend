@@ -29,6 +29,14 @@ async def course_create(parms: CoursesPost):
     return response
 
 
+@router.delete("/courses/{course_id}", status_code = 204)
+async def student_delete(course_id: int):
+    course = await CoursesORM.delete(id = course_id)
+    if not course: raise HTTPException(status_code = 404, detail = 'Aluno não encontrado')
+    await ClassesORM.delete(course_id = course_id)
+    await MaterialORM.delete(course_id = course_id)
+
+
 @router.post("/courses/{course_id}/material", status_code = 201, response_model = MaterialResponse)
 async def material_create(course_id: int, params: Material):
     material = await MaterialORM.create(course_id = course_id, file = params.file)
