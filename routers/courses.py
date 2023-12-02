@@ -7,6 +7,7 @@ from models.courses import CourseResponse
 from models.classes import ClassCurrent
 from database.courses import CoursesORM
 from database.classes import ClassesORM
+from database.material import MaterialORM
 
 
 @router.get("/courses", status_code = 200, response_model = List[CourseResponse])
@@ -32,10 +33,12 @@ async def classe_get(course_id: int, class_id: int):
     
     next_classes = [c.dict() for c in classes if isinstance(c.dict(), dict)]
     next_classes = sorted(next_classes, key = lambda c: c.get('order'))
+    material = await MaterialORM.find_one(course_id = course_id)
     
     response = ClassCurrent(
         current = class_.dict(), 
-        next_classes = next_classes
+        next_classes = next_classes,
+        material = material.file if material else None
     )
     
     return response

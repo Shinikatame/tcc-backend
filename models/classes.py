@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from typing import List
+from typing import List, Optional
     
 class Classes(BaseModel):
     name: str
@@ -26,3 +26,4 @@ class ClassesLink(BaseModel):
 class ClassCurrent(BaseModel):
     current: ClassesResponse
     next_classes: List[ClassesLink]
+    material: Optional[str] = None
