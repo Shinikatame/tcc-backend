@@ -1,4 +1,5 @@
-from fastapi import HTTPException, status
+from fastapi import HTTPException, Depends, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jwt import encode, decode
 from jwt.exceptions import DecodeError
 from passlib.context import CryptContext
@@ -20,6 +21,7 @@ def create_jwt(user: UserSignUp) -> str:
     data = UserToken(**user.dict())
     token = encode(data.dict(), SECRET_KEY, algorithm = ALGORITHM)
     return token
+    
 
 async def verify_jwt(token: str) -> UserResponse:
     try:
@@ -30,3 +32,13 @@ async def verify_jwt(token: str) -> UserResponse:
         return response
     
     except DecodeError: raise HTTPException(status_code = 401, detail = "Token JWT inválido")
+
+
+
+async def has_authenticated(auth: HTTPAuthorizationCredentials = Depends(HTTPBearer())) -> UserToken:
+    try:
+        token = auth.credentials
+        user = decode(token, SECRET_KEY, algorithms = [ALGORITHM])
+        return UserToken(**user, token = token)
+    
+    except Exception: raise HTTPException(status_code = 401, detail = "Token JWT inválido")

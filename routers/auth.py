@@ -1,9 +1,9 @@
-from fastapi import HTTPException, status, Header
+from fastapi import HTTPException, status, Depends, Header
 from routers import router
 
 from models.user import UserSignUp, UserSignIn, UserEdit, UserResponse
 from database.user import UserORM
-from modules.jwt_token import create_jwt, verify_jwt, password_hash
+from modules.jwt_token import create_jwt, password_hash, has_authenticated
 
 @router.post("/signup", status_code = 201, response_model = UserResponse)
 async def signup(params: UserSignUp):
@@ -48,14 +48,8 @@ async def profile_get(Authorization: str = Header(None)):
 
 
 @router.put("/profile", response_model = UserResponse)
-async def profile_edit(user_update: UserEdit, Authorization: str = Header(None)):
-    if not Authorization or not Authorization.startswith("Bearer "):
-        detail = 'Cabeçalho "Authorization" não especificado na solicitação' if not Authorization else 'Token JWT inválido'
-        raise HTTPException(status_code = 401, detail = detail)
-    
-    token = Authorization.replace('Bearer ', '')
-    data = await verify_jwt(token)
-    user = await UserORM.update(data.id, **user_update.dict())
+async def profile_edit(user_update: UserEdit, user: dict = Depends(has_authenticated)):
+    user = await UserORM.update(user.id, **user_update.dict())
     response = UserResponse(**user.dict(), token = token)
      
     return response
