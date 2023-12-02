@@ -5,6 +5,7 @@ from datetime import datetime
 
 from models.support import Support, SupportResponse
 from database.support import SupportORM
+from database.user import UserORM
 from modules.jwt_token import has_authenticated
 
 description = "Status: 'aberto', 'resolvido', 'aguardando'"
