@@ -42,9 +42,12 @@ async def profile_get(user: dict = Depends(has_authenticated)):
     return response
 
 
-@router.put("/profile", response_model = UserResponse)
+@router.put("/profile")
+# @router.put("/profile", response_model = UserResponse)
 async def profile_edit(user_update: UserEdit, user: dict = Depends(has_authenticated)):
+    data = await UserORM.find_one(email = user_update.email)
+    if data and data.id != user.id: raise HTTPException(status_code = 400, detail = "O email já está em uso")
+
     user = await UserORM.update(user.id, **user_update.dict())
     response = UserResponse(**user.dict())
-     
     return response
