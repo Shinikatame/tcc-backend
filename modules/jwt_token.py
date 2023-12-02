@@ -23,18 +23,6 @@ def create_jwt(user: UserSignUp) -> str:
     return token
     
 
-async def verify_jwt(token: str) -> UserResponse:
-    try:
-        payload = decode(token, SECRET_KEY, algorithms = [ALGORITHM])
-        decoded = UserToken(**payload, token = token)
-        user = await UserORM.find_one(id = decoded.id)
-        response = UserResponse(**user.dict(), token = token)
-        return response
-    
-    except DecodeError: raise HTTPException(status_code = 401, detail = "Token JWT inválido")
-
-
-
 async def has_authenticated(auth: HTTPAuthorizationCredentials = Depends(HTTPBearer())) -> UserToken:
     try:
         token = auth.credentials

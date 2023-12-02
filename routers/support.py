@@ -1,4 +1,4 @@
-from fastapi import HTTPException, status, Header
+from fastapi import HTTPException, status, Depends, Header
 from routers import router
 
 from datetime import datetime
