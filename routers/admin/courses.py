@@ -29,12 +29,31 @@ async def course_create(parms: CoursesPost):
     return response
 
 
+@router.put("/courses/{course_id}", status_code = 201, response_model = CoursesResponse)
+async def course_edit(course_id: int, parms: CoursesPost):
+    course = await CoursesORM.update(course_id, **Courses(**parms.dict()).dict())
+
+    classes = [create_task(create_class(i, course.id, c)) for i, c in enumerate(parms.classes)]
+    results = await gather(*classes)
+
+    classes = [c.dict() for c in results]
+
+    response = CoursesResponse(classes = classes, **course.dict())
+    return response
+
+
 @router.delete("/courses/{course_id}", status_code = 204)
 async def course_delete(course_id: int):
     course = await CoursesORM.delete(id = course_id)
     if not course: raise HTTPException(status_code = 404, detail = 'Curso não encontrado')
     await ClassesORM.delete(course_id = course_id)
     await MaterialORM.delete(course_id = course_id)
+
+
+@router.delete("/courses/{course_id}/classe/{class_id}", status_code = 204)
+async def class_delete(course_id: int, class_id: int):
+    class_ = await ClassesORM.delete(id = class_id, course_id = course_id)
+    if not class_: raise HTTPException(status_code = 404, detail = 'Aula não encontrada')
 
 
 @router.post("/courses/{course_id}/material", status_code = 201, response_model = MaterialResponse)
