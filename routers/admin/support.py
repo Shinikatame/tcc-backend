@@ -22,7 +22,7 @@ async def get_support(support_id: int):
 
 
 @router.patch("/support/{support_id}", response_model = SupportResponse)
-async def student_edit(support_id: int, status: str):
+async def edit_support(support_id: int, status: str):
     support = await SupportORM.update(support_id, status = status)
     if not support:
         raise HTTPException(status_code = 404, detail = 'Suporte não encontrado')
