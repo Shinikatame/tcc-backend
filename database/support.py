@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from database import Base, commit, engine, AsyncSessionLocal
+from database import Base
 
 from models.support import Support
 
@@ -13,8 +13,3 @@ class SupportORM(Base):
     description = Column(String)
     status = Column(String)
     date = Column(Integer)
-
-    @classmethod
-    @commit
-    async def create_support(cls, support: Support):
-        return cls(**support.dict())

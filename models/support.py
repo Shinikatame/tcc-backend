@@ -7,13 +7,13 @@ class StatusEnum(str, Enum):
     aguardando = 'aguardando'
     
 class Support(BaseModel):
-    name_student: str
-    name_responsible: str
-    email_responsible: str
     description: str
     status: str 
-    date: int
 
 
 class SupportResponse(Support):
     id: int
+    name_student: str
+    name_responsible: str
+    email_responsible: str
+    date: int

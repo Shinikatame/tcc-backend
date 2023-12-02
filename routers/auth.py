@@ -6,16 +6,16 @@ from database.user import UserORM
 from modules.jwt_token import create_jwt, verify_jwt, password_hash
 
 @router.post("/signup", status_code = 201, response_model = UserResponse)
-async def signup(body: UserSignUp):
-    user = await UserORM.find_one(email = body.email)
+async def signup(params: UserSignUp):
+    user = await UserORM.find_one(email = params.email)
     if user:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "O email já está em uso")
 
-    if len(body.state) >= 3:
+    if len(params.state) >= 3:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "String 'state' aceita no max 2 caracteres")
     
-    body.password = password_hash.hash(body.password)
-    data = await UserORM.create_user(body)
+    params.password = password_hash.hash(params.password)
+    data = await UserORM.create(**params.dict())
         
     token = create_jwt(data)
     response = UserResponse(**data.dict(), token = token)
@@ -23,10 +23,10 @@ async def signup(body: UserSignUp):
 
 
 @router.post("/signin", status_code = 201, response_model = UserResponse)
-async def signin(body: UserSignIn):
-    user = await UserORM.find_one(email = body.email)
+async def signin(params: UserSignIn):
+    user = await UserORM.find_one(email = params.email)
     
-    if not user or not password_hash.verify(body.password, user.password): 
+    if not user or not password_hash.verify(params.password, user.password): 
         raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED, detail = "Credenciais inválidas")
 
     token = create_jwt(user)

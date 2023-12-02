@@ -18,11 +18,12 @@ async def support(parms: Support, Authorization: str = Header(None)):
     token = Authorization.replace('Bearer ', '')
     user = await verify_jwt(token)
     
-    data = user.dict()
-    data.update(parms.dict())
+    data = parms.dict()
+    data['name_student'] = user.name
+    data['name_responsible'] = user.name_responsible
+    data['email_responsible'] = user.email_responsible
     data['date'] = int(datetime.now().timestamp())
 
-    data = SupportResponse(**data)
-    await SupportORM.create_support(data)
-
-    return data
+    support = await SupportORM.create(**data)
+    response = SupportResponse(**support.dict())
+    return response

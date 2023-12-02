@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from database import Base, commit, engine, AsyncSessionLocal
+from database import Base
 
 from models.user import UserSignUp
 from models.classes import Class
@@ -13,8 +13,3 @@ class ClassesORM(Base):
     description = Column(String)
     link = Column(String)
     order = Column(Integer)
-    
-    @classmethod
-    @commit
-    async def create_class(cls, class_: Class):
-        return cls(**class_.dict())

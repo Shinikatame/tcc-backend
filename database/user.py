@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from database import Base, commit, engine, AsyncSessionLocal
+from database import Base
 
 from models.user import UserSignUp
 
@@ -19,8 +19,3 @@ class UserORM(Base):
     address = Column(String)
     state = Column(String)
     scholarship_holder = Column(Boolean)
-
-    @classmethod
-    @commit
-    async def create_user(cls, user: UserSignUp):
-        return cls(**user.dict())

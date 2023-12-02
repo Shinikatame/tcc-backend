@@ -31,11 +31,12 @@ connect_args = {}
 if SSL:
     connect_args['ssl'] =  create_default_context(cafile = SSL)
 
+
 engine = create_async_engine(
     SQL_URL, 
     connect_args = connect_args,
     pool_pre_ping = True, 
-    echo = True
+    # echo = True
 )
 
 AsyncSessionLocal = sessionmaker(engine, expire_on_commit = False, class_ = AsyncSession)
@@ -62,6 +63,7 @@ class Base(DeclarativeBase):
             result = await db.execute(stmt)
             await db.commit()
             return result.rowcount != 0
+
             
     @classmethod
     async def find_one(cls, **kwargs):
@@ -69,6 +71,7 @@ class Base(DeclarativeBase):
             stmt = select(cls).filter_by(**kwargs)
             result = await db.execute(stmt)
             return result.scalars().first()
+
         
     @classmethod
     async def find_many(cls, **kwargs):
@@ -76,6 +79,7 @@ class Base(DeclarativeBase):
             stmt = select(cls).filter_by(**kwargs)
             result = await db.execute(stmt)
             return result.scalars().all()
+
         
     @classmethod    
     async def find_many_regex(cls, **kwargs):
@@ -85,13 +89,14 @@ class Base(DeclarativeBase):
             stmt = select(cls).filter(text(f'{col} REGEXP "{re}"'))
             result = await db.execute(stmt)
             return result.scalars().all()
-        
-def commit(coro):
-    async def wrapper(*args, **kwargs):
+
+
+    @classmethod
+    async def create(cls, **kwargs):
         async with AsyncSessionLocal() as db:
-            query = await coro(*args, **kwargs)
+            query = cls(**kwargs)
             db.add(query)
             await db.commit()
             await db.refresh(query)
-            return query
-    return wrapper
+
+        return query

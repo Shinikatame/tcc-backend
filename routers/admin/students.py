@@ -18,14 +18,16 @@ async def student_get(student_id: int):
 
 
 @router.post("/students", status_code = 201, response_model = UserResponse)
-async def student_create(body: UserSignUp):
-    user = await UserORM.find_one(email = body.email)    
-    if user:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "O email já está em uso")
+async def student_create(params: UserSignUp):
+    user = await UserORM.find_one(email = params.email)    
+    if user: raise HTTPException(status_code = 400, detail = "O email já está em uso")
     
-    body.password = password_hash.hash(body.password)
-    data = await UserORM.create_user(body)
-        
+    if len(params.state) >= 3: raise HTTPException(status_code = 400, detail = "String 'state' aceita no max 2 caracteres")
+    
+    params.password = password_hash.hash(params.password)
+
+    data = await UserORM.create(**params.dict())
+
     token = create_jwt(data)
     response = UserResponse(**data.dict(), token = token)
     return response
