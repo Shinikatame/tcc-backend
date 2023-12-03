@@ -4,7 +4,7 @@ from routers.admin import router
 from asyncio import create_task, gather
 
 from models.courses import CoursesPost, CoursesResponse, Courses
-from models.classes import Classes, Class
+from models.classes import Classes, Class, ClassesResponse
 from models.material import Material, MaterialResponse
 from models.questions import Question, QuestionAnswers, QuestionAnswersResponse, QuestionResponse
 from database.courses import CoursesORM
@@ -17,7 +17,7 @@ from typing import List
 
 async def create_class(index: int, course_id: int, class_: Classes):
     data = await ClassesORM.create(**Class(order = index, course_id = course_id, **class_.dict()).dict())
-    return data
+    return data.dict()
 
 
 async def add_answers(index: int, question_id: int, answers: QuestionAnswers):
@@ -32,7 +32,17 @@ async def course_create(parms: CoursesPost):
     classes = [create_task(create_class(i, course.id, c)) for i, c in enumerate(parms.classes)]
     results = await gather(*classes)
 
-    classes = [c.dict() for c in results]
+    response = CoursesResponse(classes = classes, **course.dict())
+    return response
+
+
+@router.get("/courses/{course_id}", status_code = 200, response_model = CoursesResponse)
+async def course_get(course_id: int):
+    course = await CoursesORM.find_one(id = course_id)
+    if not course: raise HTTPException(status_code = 404, detail = 'Curso não encontrado')
+
+    classes = await ClassesORM.find_many(course_id = course_id)
+    classes = [ClassesResponse(**c.dict()) for c in classes]
 
     response = CoursesResponse(classes = classes, **course.dict())
     return response
@@ -44,8 +54,6 @@ async def course_edit(course_id: int, parms: CoursesPost):
 
     classes = [create_task(create_class(i, course.id, c)) for i, c in enumerate(parms.classes)]
     results = await gather(*classes)
-
-    classes = [c.dict() for c in results]
 
     response = CoursesResponse(classes = classes, **course.dict())
     return response
