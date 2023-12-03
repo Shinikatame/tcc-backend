@@ -3,7 +3,7 @@ from routers.admin import router
 
 from asyncio import create_task, gather
 
-from models.courses import CoursesPost, CoursesResponse, Courses
+from models.courses import CourseResponse, CoursesPost, CoursesResponse, Courses
 from models.classes import Classes, Class, ClassesResponse
 from models.material import Material, MaterialResponse
 from models.questions import Question, QuestionPut, QuestionAnswers, QuestionAnswersResponse, QuestionResponse
@@ -36,6 +36,9 @@ async def course_create(parms: CoursesPost):
     return response
 
 
+
+
+
 @router.get("/courses/{course_id}", status_code = 200, response_model = CoursesResponse)
 async def course_get(course_id: int):
     course = await CoursesORM.find_one(id = course_id)
@@ -66,11 +69,18 @@ async def course_delete(course_id: int):
     await ClassesORM.delete(course_id = course_id)
     await MaterialORM.delete(course_id = course_id)
 
+    await QuestionsORM.delete(course_id = course_id)
+    for question in questions:
+        await QuestionsAnswersORM.delete(question_id = question.id)
+
 
 @router.delete("/courses/{course_id}/classe/{class_id}", status_code = 204)
 async def class_delete(course_id: int, class_id: int):
     class_ = await ClassesORM.delete(id = class_id, course_id = course_id)
     if not class_: raise HTTPException(status_code = 404, detail = 'Aula não encontrada')
+
+
+
 
 
 @router.get("/courses/{course_id}/material", status_code = 200, response_model = MaterialResponse)
@@ -88,17 +98,26 @@ async def material_create(course_id: int, params: Material):
     return response
 
 
-@router.put("/courses/{course_id}/material/{material_id}", status_code = 201, response_model = MaterialResponse)
-async def material_edit(course_id: int, material_id: int, params: Material):
-    material = await MaterialORM.update(material_id, file = params.file)
+@router.put("/courses/{course_id}/material", status_code = 201, response_model = MaterialResponse)
+async def material_edit(course_id: int, params: Material):
+    course = await CoursesORM.find_one(id = course_id)
+    if not course: raise HTTPException(status_code = 404, detail = 'Curso não encontrado')
+
+    material = await MaterialORM.find_one(course_id = course_id)
+    if not material: raise HTTPException(status_code = 404, detail = 'Curso não possui material')
+
+    material = await MaterialORM.update(material.id, file = params.file)
     response = MaterialResponse(**material.dict())
     return response
 
 
-@router.delete("/courses/{course_id}/material/{material_id}", status_code = 204)
-async def material_delete(course_id: int, material_id: int):
-    material = await MaterialORM.delete(id = material_id, course_id = course_id)
+@router.delete("/courses/{course_id}/material", status_code = 204)
+async def material_delete(course_id: int):
+    material = await MaterialORM.delete(course_id = course_id)
     if not material: raise HTTPException(status_code = 404, detail = 'Material não encontrado')
+
+
+
 
 
 @router.get("/courses/{course_id}/questions", status_code = 200, response_model = List[QuestionResponse])
