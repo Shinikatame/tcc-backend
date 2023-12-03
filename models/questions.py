@@ -26,3 +26,13 @@ class QuestionResponse(BaseModel):
     course_id: int
     statement: str
     answers: List[QuestionAnswersResponse] = []
+
+
+class QuestionCorrected(BaseModel):
+    question_id: int
+    answer_id: int
+
+
+class QuestionCorrectedResponse(BaseModel):
+    correct_quantity: int
+    total: int

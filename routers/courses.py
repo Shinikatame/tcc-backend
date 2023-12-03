@@ -5,7 +5,7 @@ from typing import List
 
 from models.courses import CourseResponse
 from models.classes import ClassCurrent
-from models.questions import QuestionAnswersResponse, QuestionResponse
+from models.questions import QuestionAnswersResponse, QuestionResponse, QuestionCorrected, QuestionCorrectedResponse
 from database.courses import CoursesORM
 from database.classes import ClassesORM
 from database.material import MaterialORM
@@ -65,3 +65,18 @@ async def question_get(course_id: int):
         response.append(data)
 
     return response
+
+
+@router.post("/courses/{course_id}/questions", status_code = 201, response_model = QuestionCorrectedResponse)
+async def question_corrected(course_id: int, answers: List[QuestionCorrected]):
+    course = await CoursesORM.find_one(id = course_id)
+    if not course: raise HTTPException(status_code = 404, detail = 'Curso não encontrado')
+
+    questions = await QuestionsORM.find_many(course_id = course_id)
+    correct_quantity = 0
+
+    for answer in answers:
+        question_answer = await QuestionsAnswersORM.find_one(id = answer.answer_id, question_id = answer.question_id, correct = True)
+        correct_quantity += 1 if question_answer else 0
+
+    return QuestionCorrectedResponse(correct_quantity = correct_quantity, total = len(questions))
