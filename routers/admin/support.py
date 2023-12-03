@@ -21,7 +21,7 @@ async def get_support(support_id: int):
     return SupportResponse(**support.dict())
 
 
-@router.patch("/support/{support_id}", response_model = SupportResponse)
+@router.put("/support/{support_id}", response_model = SupportResponse)
 async def edit_support(support_id: int, status: str):
     support = await SupportORM.update(support_id, status = status)
     if not support:
