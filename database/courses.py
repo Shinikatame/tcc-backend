@@ -9,3 +9,4 @@ class CoursesORM(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
     image = Column(String)
+    actived = Column(Boolean)

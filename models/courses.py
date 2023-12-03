@@ -1,11 +1,12 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 from models.classes import ClassesResponse, Classes
     
 class Courses(BaseModel):
     name: str
     image: str
+    actived: Optional[bool] = True
 
 
 class CoursesPost(Courses):
