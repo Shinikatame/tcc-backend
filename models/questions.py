@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 
 class QuestionAnswers(BaseModel):
@@ -10,6 +10,9 @@ class QuestionAnswers(BaseModel):
 class Question(BaseModel):
     statement: str
     answers: List[QuestionAnswers]
+
+class QuestionPut(Question):
+    id: int
 
 
 class QuestionAnswersResponse(QuestionAnswers):
@@ -22,4 +25,4 @@ class QuestionResponse(BaseModel):
     id: int
     course_id: int
     statement: str
-    question_answers: List[QuestionAnswersResponse] = []
+    answers: List[QuestionAnswersResponse] = []

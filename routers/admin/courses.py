@@ -6,7 +6,7 @@ from asyncio import create_task, gather
 from models.courses import CoursesPost, CoursesResponse, Courses
 from models.classes import Classes, Class, ClassesResponse
 from models.material import Material, MaterialResponse
-from models.questions import Question, QuestionAnswers, QuestionAnswersResponse, QuestionResponse
+from models.questions import Question, QuestionPut, QuestionAnswers, QuestionAnswersResponse, QuestionResponse
 from database.courses import CoursesORM
 from database.classes import ClassesORM
 from database.material import MaterialORM
@@ -101,12 +101,24 @@ async def material_delete(course_id: int, material_id: int):
     if not material: raise HTTPException(status_code = 404, detail = 'Material não encontrado')
 
 
-# @router.get("/courses/{course_id}/material", status_code = 200, response_model = MaterialResponse)
-# async def material(course_id: int):
-#     material = await MaterialORM.find_one(course_id = course_id)
-#     if not material: raise HTTPException(status_code = 404, detail = 'Material não encontrado')
-#     response = MaterialResponse(**material.dict())
-#     return response
+@router.get("/courses/{course_id}/questions", status_code = 200, response_model = List[QuestionResponse])
+async def question_get(course_id: int):
+    course = await CoursesORM.find_one(id = course_id)
+    if not course: raise HTTPException(status_code = 404, detail = 'Curso não encontrado')
+
+    response = []
+    questions = await QuestionsORM.find_many(course_id = course_id)
+    
+    for question in questions:
+        answers = await QuestionsAnswersORM.find_many(question_id = question.id)
+        answers = [QuestionAnswersResponse(**a.dict()) for a in answers]
+
+        data = QuestionResponse(**question.dict())
+        data.answers = [QuestionAnswersResponse(**a.dict()) for a in answers]
+
+        response.append(data)
+
+    return response
 
 
 @router.post("/courses/{course_id}/questions", status_code = 201, response_model = List[QuestionResponse])
@@ -122,21 +134,44 @@ async def question_create(course_id: int, questions: List[Question]):
         answers_results = await gather(*answers)
 
         data = QuestionResponse(**question.dict())
-        data.question_answers.append(answers_results)
+        data.answers.append(answers_results)
         response.append(data)
 
     return response
 
 
-# @router.put("/courses/{course_id}/material/{material_id}", status_code = 201, response_model = MaterialResponse)
-# async def material_edit(course_id: int, material_id: int, params: Material):
-#     material = await MaterialORM.update(material_id, file = params.file)
-#     response = MaterialResponse(**material.dict())
-#     return response
+@router.put("/courses/{course_id}/questions", status_code = 201, response_model = List[QuestionResponse])
+async def question_edit(course_id: int, questions: List[QuestionPut]):
+    course = await CoursesORM.find_one(id = course_id)
+    if not course: raise HTTPException(status_code = 404, detail = 'Curso não encontrado')
 
 
-@router.delete("/courses/{course_id}/questions/{question_id}", status_code = 204)
-async def question_delete(course_id: int, question_id: int):
-    question = await QuestionsORM.delete(id = question_id, course_id = course_id)
-    if not question: raise HTTPException(status_code = 404, detail = 'Questão não encontrada')
-    await QuestionsAnswersORM.delete(question_id = question_id)
+    couse_questions = await QuestionsORM.find_many(course_id = course_id)
+    if not couse_questions: raise HTTPException(status_code = 404, detail = 'Curso não possui questões')
+   
+    response = []
+    
+    for qt in questions:
+        question = await QuestionsORM.update(qt.id, statement = qt.statement)
+        await QuestionsAnswersORM.delete(question_id = qt.id)
+        answers = [create_task(add_answers(i, question.id, q)) for i, q in enumerate(qt.answers)]
+        answers_results = await gather(*answers)
+
+        data = QuestionResponse(**question.dict())
+        data.answers.append(answers_results)
+        response.append(data)
+
+    return response
+
+
+@router.delete("/courses/{course_id}/questions", status_code = 204)
+async def question_delete(course_id: int):
+    course = await CoursesORM.find_one(id = course_id)
+    if not course: raise HTTPException(status_code = 404, detail = 'Curso não encontrado')
+
+    questions = await QuestionsORM.find_many(course_id = course_id)
+    if not questions: raise HTTPException(status_code = 404, detail = 'Curso não possui questões')
+
+    await QuestionsORM.delete(course_id = course_id)
+    for question in questions:
+        await QuestionsAnswersORM.delete(question_id = question.id)
