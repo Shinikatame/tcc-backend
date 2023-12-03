@@ -5,9 +5,12 @@ from typing import List
 
 from models.courses import CourseResponse
 from models.classes import ClassCurrent
+from models.questions import QuestionAnswersResponse, QuestionResponse
 from database.courses import CoursesORM
 from database.classes import ClassesORM
 from database.material import MaterialORM
+from database.questions import QuestionsORM
+from database.questions_answers import QuestionsAnswersORM
 
 
 @router.get("/courses", status_code = 200, response_model = List[CourseResponse])
@@ -41,4 +44,24 @@ async def classe_get(course_id: int, class_id: int):
         material = material.file if material else None
     )
     
+    return response
+
+
+@router.get("/courses/{course_id}/questions", status_code = 200, response_model = List[QuestionResponse])
+async def question_get(course_id: int):
+    course = await CoursesORM.find_one(id = course_id)
+    if not course: raise HTTPException(status_code = 404, detail = 'Curso não encontrado')
+
+    response = []
+    questions = await QuestionsORM.find_many(course_id = course_id)
+    
+    for question in questions:
+        answers = await QuestionsAnswersORM.find_many(question_id = question.id)
+        answers = [QuestionAnswersResponse(**a.dict()) for a in answers]
+
+        data = QuestionResponse(**question.dict())
+        data.answers = [QuestionAnswersResponse(**a.dict()) for a in answers]
+
+        response.append(data)
+
     return response

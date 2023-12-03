@@ -120,26 +120,6 @@ async def material_delete(course_id: int):
 
 
 
-@router.get("/courses/{course_id}/questions", status_code = 200, response_model = List[QuestionResponse])
-async def question_get(course_id: int):
-    course = await CoursesORM.find_one(id = course_id)
-    if not course: raise HTTPException(status_code = 404, detail = 'Curso não encontrado')
-
-    response = []
-    questions = await QuestionsORM.find_many(course_id = course_id)
-    
-    for question in questions:
-        answers = await QuestionsAnswersORM.find_many(question_id = question.id)
-        answers = [QuestionAnswersResponse(**a.dict()) for a in answers]
-
-        data = QuestionResponse(**question.dict())
-        data.answers = [QuestionAnswersResponse(**a.dict()) for a in answers]
-
-        response.append(data)
-
-    return response
-
-
 @router.post("/courses/{course_id}/questions", status_code = 201, response_model = List[QuestionResponse])
 async def question_create(course_id: int, questions: List[Question]):
     course = await CoursesORM.find_one(id = course_id)
