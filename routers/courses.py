@@ -20,7 +20,7 @@ async def courses_get():
 
     for course in courses:
         class_ = await ClassesORM.find_one(course_id = course.id)
-        data = CourseResponse(class_id = class_.id, **course.dict())
+        data = CourseResponse(class_id = class_.id if class_ else None, **course.dict())
         response.append(data)
 
     return response

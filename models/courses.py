@@ -15,7 +15,7 @@ class CoursesPost(Courses):
 
 class CourseResponse(Courses):
     id: int
-    class_id: int
+    class_id: Optional[int]
 
 class CoursesResponse(Courses):
     id: int
