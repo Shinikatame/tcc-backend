@@ -32,7 +32,7 @@ async def course_create(parms: CoursesPost):
     classes = [create_task(create_class(i, course.id, c)) for i, c in enumerate(parms.classes)]
     results = await gather(*classes)
 
-    response = CoursesResponse(classes = classes, **course.dict())
+    response = CoursesResponse(classes = results, **course.dict())
     return response
 
 
