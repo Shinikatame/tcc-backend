@@ -70,6 +70,7 @@ async def course_delete(course_id: int):
     await MaterialORM.delete(course_id = course_id)
 
     await QuestionsORM.delete(course_id = course_id)
+    questions = await QuestionsORM.find_many(course_id = course_id)
     for question in questions:
         await QuestionsAnswersORM.delete(question_id = question.id)
 
